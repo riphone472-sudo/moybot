@@ -3,12 +3,12 @@ from telegram.ext import Application, CommandHandler, MessageHandler, ContextTyp
 from PIL import Image, ImageDraw, ImageFont
 import random
 import io
-import math
 
 TOKEN = "8001601776:AAHZilOQnrb3eWKN3bLIn-3gnqRD-aY7l_E" 
 
 users = {}
 
+# ===== CAPTCHA RASM (SONLAR KATTA) =====
 def generate_code_image(code: str):
     width, height = 600, 300
     bg_color = (random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
@@ -16,28 +16,34 @@ def generate_code_image(code: str):
     draw = ImageDraw.Draw(img)
 
     try:
-        font = ImageFont.truetype("arial.ttf", 80)
+        font = ImageFont.truetype("arial.ttf", 220)  # SONLAR KATTA
     except:
         font = ImageFont.load_default()
 
     digit_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
-    x = 50
+    x = 30
     for ch in code:
-        angle = random.randint(-45, 45)
-        char_img = Image.new("RGBA", (250, 250), (0, 0, 0, 0))  # kattaroq oyna
-        char_draw = ImageDraw.Draw(char_img)
-        font_size_variation = random.randint(150, 200)  # kattaroq font
-        try:
-            font_var = ImageFont.truetype("arial.ttf", font_size_variation)
-        except:
-            font_var = font
-        # Qalinroq raqam uchun stroke
-        char_draw.text((5, 0), ch, font=font_var, fill=digit_color, stroke_width=3, stroke_fill=(0,0,0))
-        rotated = char_img.rotate(angle, expand=1)
-        img.paste(rotated, (x, random.randint(50, 130)), rotated)
-        x += random.randint(100, 130)
+        angle = random.randint(-35, 35)
 
+        # Katta oynada raqam
+        char_img = Image.new("RGBA", (320, 320), (0, 0, 0, 0))
+        char_draw = ImageDraw.Draw(char_img)
+
+        char_draw.text(
+            (20, 10),
+            ch,
+            font=font,
+            fill=digit_color,
+            stroke_width=6,
+            stroke_fill=(0, 0, 0)
+        )
+
+        rotated = char_img.rotate(angle, expand=True)
+        img.paste(rotated, (x, random.randint(20, 60)), rotated)
+        x += 105  # Raqamlar orasidagi masofa
+
+    # Chiziqlar
     for _ in range(25):
         draw.line(
             (
@@ -46,14 +52,15 @@ def generate_code_image(code: str):
                 random.randint(0, width),
                 random.randint(0, height)
             ),
-            fill=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),
-            width=random.randint(1, 3)
+            fill=(random.randint(0,255), random.randint(0,255), random.randint(0,255)),
+            width=random.randint(2, 4)
         )
 
+    # Shovqin nuqtalar
     for _ in range(300):
         draw.point(
             (random.randint(0, width), random.randint(0, height)),
-            fill=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+            fill=(random.randint(0,255), random.randint(0,255), random.randint(0,255))
         )
 
     bio = io.BytesIO()
@@ -62,6 +69,7 @@ def generate_code_image(code: str):
     bio.seek(0)
     return bio
 
+# ===== TUGMALAR =====
 def get_buttons():
     keyboard = [
         [InlineKeyboardButton("⚜️ОПЕРАТОР ТАШКЕНТ⚜️", url="https://t.me/twc29")],
@@ -71,6 +79,7 @@ def get_buttons():
     ]
     return InlineKeyboardMarkup(keyboard)
 
+# ===== START =====
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     user_id = user.id
@@ -85,6 +94,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_photo(photo=image, caption=message_text)
 
+# ===== KOD TEKSHIRISH =====
 async def check_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
@@ -104,11 +114,12 @@ async def check_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message_text = f"Привет, {name}. Пожалуйста, решите капчу с цифрами на этом изображении, чтобы убедиться, что вы человек."
         await update.message.reply_photo(photo=image, caption=message_text)
 
+# ===== MAIN =====
 def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, check_code))
     app.run_polling()
 
-if __name__ == "__main__":
+if name == "main":
     main()
