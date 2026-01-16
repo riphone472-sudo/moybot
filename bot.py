@@ -12,40 +12,34 @@ users = {}
 # ===== CAPTCHA RASM ======
 def generate_code_image(code: str):
     width, height = 600, 300
-    # Tasodifiy fon rangi
+    # Fon rangi
     bg_color = (random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
     img = Image.new("RGB", (width, height), bg_color)
     draw = ImageDraw.Draw(img)
 
-    try:
-        font = ImageFont.truetype("arial.ttf", 80)
-    except:
-        font = ImageFont.load_default()
-
-    # Raqamlar uchun tasodifiy bitta rang
+    # Raqamlar uchun rang
     digit_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
     x = 50
     for ch in code:
-        # Har bir raqam uchun biroz burchak bilan burish
-        angle = random.randint(-45, 45)
-        # Raqamni alohida rasmga chizamiz
-        char_img = Image.new("RGBA", (250, 250), (0, 0, 0, 0))  # Kattaroq rasm
+        angle = random.randint(-25, 25)  # biroz burish
+        char_img = Image.new("RGBA", (250, 250), (0, 0, 0, 0))
         char_draw = ImageDraw.Draw(char_img)
-        # Fontni kattaroq va qalin qilish
-        font_size_variation = random.randint(150, 200)
+        font_size_variation = random.randint(160, 200)  # katta font
         try:
             font_var = ImageFont.truetype("arial.ttf", font_size_variation)
         except:
-            font_var = font
-        # Qalin raqam uchun stroke
-        char_draw.text((5, 0), ch, font=font_var, fill=digit_color, stroke_width=3, stroke_fill=(0,0,0))
+            font_var = ImageFont.load_default()
+        # Qalin raqam
+        char_draw.text(
+            (10, 20), ch, font=font_var, fill=digit_color,
+            stroke_width=4, stroke_fill=(0,0,0)
+        )
         rotated = char_img.rotate(angle, expand=1)
-        # Asl rasmga joylashtirish
-        img.paste(rotated, (x, random.randint(50, 130)), rotated)
-        x += random.randint(100, 130)  # raqamlar orasidagi masofa biroz kattaroq
+        img.paste(rotated, (x, random.randint(50, 100)), rotated)
+        x += random.randint(110, 140)  # raqamlar orasidagi masofa
 
-    # Tasodifiy chiziqlar
+    # Fon chiziqlari (raqamni yashirmasdan)
     for _ in range(25):
         draw.line(
             (
@@ -54,12 +48,12 @@ def generate_code_image(code: str):
                 random.randint(0, width),
                 random.randint(0, height)
             ),
-            fill=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),
-            width=random.randint(1, 3)
+            fill=(random.randint(100, 255), random.randint(100, 255), random.randint(100, 255)),
+            width=random.randint(2, 4)
         )
 
     # Tasodifiy nuqtalar
-    for _ in range(300):
+    for _ in range(200):
         draw.point(
             (random.randint(0, width), random.randint(0, height)),
             fill=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
@@ -93,7 +87,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     image = generate_code_image(code)
 
-    # Tugmalar tepasidagi matnni dinamik sozlash
+    # Tugmalar tepasidagi matn
     message_text = f"Привет, {name}. Пожалуйста, решите капчу с цифрами на этом изображении, чтобы убедиться, что вы человек."
 
     await update.message.reply_photo(photo=image, caption=message_text)
