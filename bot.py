@@ -25,7 +25,7 @@ def generate_code_image(code: str):
     x = 50
     for ch in code:
         angle = random.randint(-45, 45)
-        char_img = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
+        char_img = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
         char_draw = ImageDraw.Draw(char_img)
         font_size_variation = random.randint(120, 160)
         try:
