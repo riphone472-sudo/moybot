@@ -5,7 +5,7 @@ import random
 import io
 import math
 
-TOKEN = "8001601776:AAHZilOQnrb3eWKN3bLIn-3gnqRD-aY7l_E"
+TOKEN = "8001601776:AAHZilOQnrb3eWKN3bLIn-3gnqRD-aY7l_E" 
 
 users = {}
 
@@ -25,17 +25,18 @@ def generate_code_image(code: str):
     x = 50
     for ch in code:
         angle = random.randint(-45, 45)
-        char_img = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
+        char_img = Image.new("RGBA", (250, 250), (0, 0, 0, 0))  # kattaroq oyna
         char_draw = ImageDraw.Draw(char_img)
-        font_size_variation = random.randint(120, 160)
+        font_size_variation = random.randint(150, 200)  # kattaroq font
         try:
             font_var = ImageFont.truetype("arial.ttf", font_size_variation)
         except:
             font_var = font
-        char_draw.text((10, 0), ch, font=font_var, fill=digit_color)
+        # Qalinroq raqam uchun stroke
+        char_draw.text((5, 0), ch, font=font_var, fill=digit_color, stroke_width=3, stroke_fill=(0,0,0))
         rotated = char_img.rotate(angle, expand=1)
         img.paste(rotated, (x, random.randint(50, 130)), rotated)
-        x += random.randint(80, 100)
+        x += random.randint(100, 130)
 
     for _ in range(25):
         draw.line(
