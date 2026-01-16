@@ -27,7 +27,7 @@ def generate_code_image(code: str):
         angle = random.randint(-45, 45)
         char_img = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
         char_draw = ImageDraw.Draw(char_img)
-        font_size_variation = random.randint(70, 90)
+        font_size_variation = random.randint(120, 160)
         try:
             font_var = ImageFont.truetype("arial.ttf", font_size_variation)
         except:
