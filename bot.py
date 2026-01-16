@@ -110,7 +110,6 @@ async def check_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.text == users[user_id]["code"]:
         users[user_id]["verified"] = True
 
-ОПЕРАТОР ТАШКЕНТ, [16.01.2026 13:26]
 # Tugmalar tepasidagi matn
         message_text = "⚡️Вас приветствует Tesla Shop⚡️\nЕсли вам нужна помощь с покупкой, пожалуйста, свяжитесь с оператором."
         await update.message.reply_text(message_text, reply_markup=get_buttons())
