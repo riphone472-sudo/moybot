@@ -5,7 +5,7 @@ import random
 import io
 import math
 
-TOKEN = "8001601776:AAHZilOQnrb3eWKN3bLIn-3gnqRD-aY7l_E"  # <--- tokenni shu yerga qo'ying
+TOKEN = "8001601776:AAHZilOQnrb3eWKN3bLIn-3gnqRD-aY7l_E"
 
 users = {}
 
@@ -129,5 +129,5 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, check_code))
     app.run_polling()
 
-if name == "main":
+if __name__ == "__main__":
     main()
