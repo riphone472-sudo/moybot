@@ -5,7 +5,7 @@ import random
 import io
 import math
 
-TOKEN = "8001601776:AAHZilOQnrb3eWKN3bLIn-3gnqRD-aY7l_E"
+TOKEN = "8001601776:AAHZilOQnrb3eWKN3bLIn-3gnqRD-aY7l_E" 
 
 users = {}
 
@@ -30,19 +30,20 @@ def generate_code_image(code: str):
         # Har bir raqam uchun biroz burchak bilan burish
         angle = random.randint(-45, 45)
         # Raqamni alohida rasmga chizamiz
-        char_img = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
+        char_img = Image.new("RGBA", (250, 250), (0, 0, 0, 0))  # Kattaroq rasm
         char_draw = ImageDraw.Draw(char_img)
-        # Font o'lchamini ham biroz o'zgartirish
-        font_size_variation = random.randint(70, 90)
+        # Fontni kattaroq va qalin qilish
+        font_size_variation = random.randint(150, 200)
         try:
             font_var = ImageFont.truetype("arial.ttf", font_size_variation)
         except:
             font_var = font
-        char_draw.text((10, 0), ch, font=font_var, fill=digit_color)
+        # Qalin raqam uchun stroke
+        char_draw.text((5, 0), ch, font=font_var, fill=digit_color, stroke_width=3, stroke_fill=(0,0,0))
         rotated = char_img.rotate(angle, expand=1)
         # Asl rasmga joylashtirish
         img.paste(rotated, (x, random.randint(50, 130)), rotated)
-        x += random.randint(80, 100)
+        x += random.randint(100, 130)  # raqamlar orasidagi masofa biroz kattaroq
 
     # Tasodifiy chiziqlar
     for _ in range(25):
@@ -106,11 +107,11 @@ async def check_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     name = users[user_id]["name"]
 
-# Kod to'g'ri kiritsa
+    # Kod to'g'ri kiritsa
     if update.message.text == users[user_id]["code"]:
         users[user_id]["verified"] = True
 
-# Tugmalar tepasidagi matn
+        # Tugmalar tepasidagi matn
         message_text = "⚡️Вас приветствует Tesla Shop⚡️\nЕсли вам нужна помощь с покупкой, пожалуйста, свяжитесь с оператором."
         await update.message.reply_text(message_text, reply_markup=get_buttons())
     else:
