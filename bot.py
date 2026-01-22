@@ -3,57 +3,56 @@ from telegram.ext import Application, CommandHandler, MessageHandler, ContextTyp
 from PIL import Image, ImageDraw, ImageFont
 import random
 import io
+import math
 
-TOKEN = "8001601776:AAHZilOQnrb3eWKN3bLIn-3gnqRD-aY7l_E"  # <-- bu yerga tokeningizni qo'ying
+bot=TOKEN = "8001601776:AAEdp0gsAl_mjSlZs5yWEvoyFIgFUGo5-fM"
 
 users = {}
 
-# ===== CAPTCHA RASM ======
 def generate_code_image(code: str):
-    width, height = 800, 250  # rasm kattaligi
-    bg_color = (0, 0, 0)  # qora fon
+    width, height = 600, 300
+    bg_color = (random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
     img = Image.new("RGB", (width, height), bg_color)
     draw = ImageDraw.Draw(img)
 
-    x = 20
+    try:
+        font = ImageFont.truetype("arial.ttf", 80)
+    except:
+        font = ImageFont.load_default()
+
+    digit_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+    x = 50
     for ch in code:
-        angle = random.randint(-15, 15)
-        char_img = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
+        angle = random.randint(-45, 45)
+        char_img = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
         char_draw = ImageDraw.Draw(char_img)
-        font_size = random.randint(160, 180)
+        font_size_variation = random.randint(70, 90)
         try:
-            font = ImageFont.truetype("arial.ttf", font_size)
+            font_var = ImageFont.truetype("arial.ttf", font_size_variation)
         except:
-            font = ImageFont.load_default()
-
-        digit_color = (255, 182, 193)  # pushti rang
-        char_draw.text(
-            (0, 0),
-            ch,
-            font=font,
-            fill=digit_color,
-            stroke_width=3,
-            stroke_fill=(128, 0, 128)  # qalin kontur
-        )
-
+            font_var = font
+        char_draw.text((10, 0), ch, font=font_var, fill=digit_color)
         rotated = char_img.rotate(angle, expand=1)
-        img.paste(rotated, (x, random.randint(20, 50)), rotated)
-        x += rotated.size[0] - 20
+        img.paste(rotated, (x, random.randint(50, 130)), rotated)
+        x += random.randint(80, 100)
 
-    # Fon chiziqlari
-    for _ in range(40):
+    for _ in range(25):
         draw.line(
-            (random.randint(0, width), random.randint(0, height),
-             random.randint(0, width), random.randint(0, height)),
-            fill=(0, 255, 0),
-            width=random.randint(1, 2)
+            (
+                random.randint(0, width),
+                random.randint(0, height),
+                random.randint(0, width),
+                random.randint(0, height)
+            ),
+            fill=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),
+            width=random.randint(1, 3)
         )
 
-    # Tasodifiy nuqtalar
     for _ in range(300):
         draw.point(
             (random.randint(0, width), random.randint(0, height)),
-            fill=(255, 255, 255)
+            fill=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         )
 
     bio = io.BytesIO()
@@ -62,23 +61,20 @@ def generate_code_image(code: str):
     bio.seek(0)
     return bio
 
-# ====== TUGMALAR ======
 def get_buttons():
     keyboard = [
-        [InlineKeyboardButton("⚜️ОПЕРАТОР ТАШКЕНТ⚜️", url="https://t.me/twc29")],
-        [InlineKeyboardButton("⚜️ТЕХ Поддержка⚜️", url="https://t.me/evcvcn")],
-        [InlineKeyboardButton("🔱ОПЕРАТОР ПРИГОРОД🔱", url="https://t.me/yvczc")],
-        [InlineKeyboardButton("🔱ТЕХ Поддержка ПРИГОРОД🔱", url="https://t.me/ycbzb")],
+        [InlineKeyboardButton("⚜️ОПЕРАТОР ТАШКЕНТ⚜️", url="https://t.me/tw")],
+        [InlineKeyboardButton("⚜️ТЕХ Поддержка⚜️", url="https://t.me/evcn")],
+        [InlineKeyboardButton("🔱ОПЕРАТОР ПРИГОРОД🔱", url="https://t.me/yzc")],
+        [InlineKeyboardButton("🔱ТЕХ Поддержка ПРИГОРОД🔱", url="https://t.me/yzb")],
     ]
     return InlineKeyboardMarkup(keyboard)
 
-# ====== START ======
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     user_id = user.id
     name = user.first_name or "User"
 
-    # Yangi kod yaratish
     code = str(random.randint(10000, 99999))
     users[user_id] = {"verified": False, "code": code, "name": name}
 
@@ -88,7 +84,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_photo(photo=image, caption=message_text)
 
-# ====== KOD TEKSHIRISH ======
 async def check_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
@@ -108,7 +103,6 @@ async def check_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message_text = f"Привет, {name}. Пожалуйста, решите капчу с цифрами на этом изображении, чтобы убедиться, что вы человек."
         await update.message.reply_photo(photo=image, caption=message_text)
 
-# ====== MAIN ======
 def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
